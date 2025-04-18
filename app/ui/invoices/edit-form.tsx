@@ -1,6 +1,7 @@
 'use client';
 
-import { updateInvoice } from '@/app/lib/actions';
+import { updateInvoice, State } from '@/app/lib/actions';
+import { useActionState } from 'react';
 import { CustomerField, InvoiceForm } from '@/app/lib/definitions';
 import {
   CheckIcon,
@@ -18,18 +19,14 @@ export default function EditInvoiceForm({
   invoice: InvoiceForm;
   customers: CustomerField[];
 }) {
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Evitar el comportamiento predeterminado del formulario
+  const initialState: State = { message: null, errors: {} };
+  const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
+  const [state, formAction] = useActionState(updateInvoiceWithId, initialState);
+ 
 
-    const formData = new FormData(event.currentTarget);
-    await updateInvoice(invoice.id, formData); // Asegúrate de que updateInvoice acepte FormData
-
-    // Opcional: Redirigir o mostrar un mensaje de éxito
-    window.location.href = '/dashboard/invoices'; // Redirigir después de la actualización
-  };
 
   return (
-    <form onSubmit={handleSubmit}>  
+    <form action={formAction}> 
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
